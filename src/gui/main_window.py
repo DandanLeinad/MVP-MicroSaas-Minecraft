@@ -18,6 +18,7 @@ def run_gui():
         # Limpa listas
         lista_mundos.delete(0, tk.END)
         lista_backups.delete(0, tk.END)
+        desc_entry.delete(0, tk.END)
 
         # Carrega mundos
         worlds = core.list_worlds(path)
@@ -28,10 +29,11 @@ def run_gui():
             lista_mundos.insert(tk.END, "(nenhum mundo encontrado)")
 
         # Carrega backups
-        backups = core.list_backups(edicao)
-        if backups:
-            for b in backups:
-                lista_backups.insert(tk.END, b)
+        backups_data = core.list_backups(edicao)
+        if backups_data:
+            for fname, desc in backups_data:
+                label = f"{fname} - {desc}" if desc else fname
+                lista_backups.insert(tk.END, label)
         else:
             lista_backups.insert(tk.END, "(nenhum backup encontrado)")
 
@@ -56,7 +58,15 @@ def run_gui():
             else detect_bedrock.get_bedrock_worlds_path()
         )
 
-        sucesso = core.make_backup(path, mundo, edicao)
+        # Coleta e valida descrição
+        desc = desc_entry.get().strip()
+        if any(c in desc for c in r"\/:*?\"<>|"):
+            messagebox.showerror(
+                "Erro", "Descrição contém caracteres inválidos."
+            )
+            return
+
+        sucesso = core.make_backup(path, mundo, edicao, desc)
         # Notificação via pop-up
         if sucesso:
             msg = f"Backup do mundo '{mundo}' criado com sucesso!"
@@ -64,17 +74,20 @@ def run_gui():
         else:
             err_msg = f"Falha ao criar backup do mundo '{mundo}'."
             messagebox.showerror("Erro", err_msg)
-        # Atualiza lista de backups
+        # Atualiza lista de backups com descrições
         lista_backups.delete(0, tk.END)
-        for b in core.list_backups(edicao):
-            lista_backups.insert(tk.END, b)
+        for fname, desc in core.list_backups(edicao):
+            label = f"{fname} - {desc}" if desc else fname
+            lista_backups.insert(tk.END, label)
 
     def restaurar_backup():
         selecionado = lista_backups.curselection()
         if not selecionado:
             label_status.config(text="❌ Nenhum backup selecionado.")
             return
-        backup_name = lista_backups.get(selecionado)
+        entry = lista_backups.get(selecionado)
+        # extrai nome do arquivo antes de ' - '
+        backup_name = entry.split(" - ", 1)[0]
         edicao = edicao_var.get()
         path = (
             detect_java.get_java_worlds_path()
@@ -114,6 +127,10 @@ def run_gui():
     frame_mundos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
     lista_mundos = tk.Listbox(frame_mundos, width=30, height=15)
     lista_mundos.pack(fill=tk.BOTH, expand=True)
+    # Campo opcional de descrição/tag
+    tk.Label(frame_mundos, text="Descrição (opcional):").pack(pady=(5, 0))
+    desc_entry = tk.Entry(frame_mundos)
+    desc_entry.pack(fill=tk.X, padx=5)
     btn_backup = tk.Button(
         frame_mundos, text="Criar Backup", command=criar_backup
     )

@@ -1,3 +1,5 @@
+# para metadata dos backups
+import json
 import os
 import zipfile
 from datetime import datetime
@@ -34,7 +36,20 @@ def list_backups(edition=None):
     else:
         dir_ = BACKUP_DIR
     try:
-        return [f for f in os.listdir(dir_) if f.lower().endswith(".zip")]
+        backups = []
+        for fname in os.listdir(dir_):
+            if not fname.lower().endswith(".zip"):
+                continue
+            desc = ""
+            try:
+                with zipfile.ZipFile(os.path.join(dir_, fname), "r") as z:
+                    if "metadata.json" in z.namelist():
+                        data = json.loads(z.read("metadata.json"))
+                        desc = data.get("description", "")
+            except Exception:
+                pass
+            backups.append((fname, desc))
+        return backups
     except FileNotFoundError:
         return []
 
@@ -60,9 +75,10 @@ def restore_backup(worlds_path, backup_name, edition=None):
         return False
 
 
-def make_backup(worlds_path, world_name, edition=None):
-    # Cria backup no diretório da edição e retorna status
+def make_backup(worlds_path, world_name, edition=None, description=None):
+    # Cria backup com metadata de descrição e retorna status
     try:
+        # seleciona pasta
         if edition == "java":
             backup_dir = BACKUP_DIR_JAVA
         elif edition == "bedrock":
@@ -80,6 +96,14 @@ def make_backup(worlds_path, world_name, edition=None):
                     rel_path = os.path.relpath(abs_file, src)
                     arc = os.path.join(world_name, rel_path)
                     zipf.write(abs_file, arcname=arc)
+            # adiciona metadata.json dentro do zip
+            meta = {
+                "world": world_name,
+                "edition": edition,
+                "timestamp": now,
+                "description": description or "",
+            }
+            zipf.writestr("metadata.json", json.dumps(meta))
         ok = f"✅ Backup salvo: {dst}"
         print(Fore.GREEN + ok)
         return True
@@ -109,8 +133,8 @@ def menu(worlds_path, edition=None):
         )
         print(title)
         if backups:
-            for j, b in enumerate(backups):
-                print(f"  {j + 1}. {b}")
+            for j, (b, desc) in enumerate(backups):
+                print(f"  {j + 1}. {b} - {desc}")
         else:
             print("  (nenhum backup encontrado)")
 
@@ -126,7 +150,13 @@ def menu(worlds_path, edition=None):
             idx = input("Escolha o número do mundo para backup: ")
             try:
                 world_name = worlds[int(idx) - 1]
-                make_backup(worlds_path, world_name, edition)
+                # descrição opcional
+                desc = input("Descrição/tag (opcional): ").strip()
+                # valida caracteres inválidos
+                if any(c in desc for c in r"\/:*?\"<>|"):
+                    print("❌ Descrição contém caracteres inválidos.")
+                else:
+                    make_backup(worlds_path, world_name, edition, desc)
             except Exception:
                 print("Entrada inválida.")
         elif choice == "r":
@@ -135,7 +165,7 @@ def menu(worlds_path, edition=None):
                 continue
             idxb = input("Escolha o número do backup para restaurar: ")
             try:
-                backup_name = backups[int(idxb) - 1]
+                backup_name = backups[int(idxb) - 1][0]
                 restore_backup(worlds_path, backup_name, edition)
             except Exception:
                 print("Entrada inválida.")
