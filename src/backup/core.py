@@ -2,6 +2,13 @@ import os
 import zipfile
 from datetime import datetime
 
+# noqa to suppress linting error for missing module
+import colorama  # noqa
+from colorama import Fore  # noqa
+
+# Inicializa colorama para cores no console
+colorama.init(autoreset=True)
+
 BACKUP_DIR = "backups_worlds"
 BACKUP_DIR_BEDROCK = "backups_worlds/bedrock"
 BACKUP_DIR_JAVA = "backups_worlds/java"
@@ -44,32 +51,42 @@ def restore_backup(worlds_path, backup_name, edition=None):
     try:
         with zipfile.ZipFile(src, "r") as zipf:
             zipf.extractall(worlds_path)
-        print(f"✅ Backup restaurado: {backup_name} em {worlds_path}")
+        msg = f"✅ Backup restaurado: {backup_name} em {worlds_path}"
+        print(Fore.GREEN + msg)
+        return True
     except Exception as e:
-        print(f"❌ Falha ao restaurar backup: {e}")
+        err = f"❌ Falha ao restaurar backup: {e}"
+        print(Fore.RED + err)
+        return False
 
 
 def make_backup(worlds_path, world_name, edition=None):
-    # Seleciona o diretório de backup de acordo com a edição
-    if edition == "java":
-        backup_dir = BACKUP_DIR_JAVA
-    elif edition == "bedrock":
-        backup_dir = BACKUP_DIR_BEDROCK
-    else:
-        backup_dir = BACKUP_DIR
-    os.makedirs(backup_dir, exist_ok=True)
-    src = os.path.join(worlds_path, world_name)
-    now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    dst = os.path.join(backup_dir, f"{world_name}_{now}.zip")
-    with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _, files in os.walk(src):
-            for file in files:
-                abs_file = os.path.join(root, file)
-                rel_path = os.path.relpath(abs_file, src)
-                zipf.write(
-                    abs_file, arcname=os.path.join(world_name, rel_path)
-                )
-    print(f"✅ Backup salvo: {dst}")
+    # Cria backup no diretório da edição e retorna status
+    try:
+        if edition == "java":
+            backup_dir = BACKUP_DIR_JAVA
+        elif edition == "bedrock":
+            backup_dir = BACKUP_DIR_BEDROCK
+        else:
+            backup_dir = BACKUP_DIR
+        os.makedirs(backup_dir, exist_ok=True)
+        src = os.path.join(worlds_path, world_name)
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        dst = os.path.join(backup_dir, f"{world_name}_{now}.zip")
+        with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(src):
+                for file in files:
+                    abs_file = os.path.join(root, file)
+                    rel_path = os.path.relpath(abs_file, src)
+                    arc = os.path.join(world_name, rel_path)
+                    zipf.write(abs_file, arcname=arc)
+        ok = f"✅ Backup salvo: {dst}"
+        print(Fore.GREEN + ok)
+        return True
+    except Exception as e:
+        err = f"❌ Falha ao criar backup: {e}"
+        print(Fore.RED + err)
+        return False
 
 
 def menu(worlds_path, edition=None):
@@ -86,9 +103,11 @@ def menu(worlds_path, edition=None):
 
         # Listagem de backups
         backups = list_backups(edition)
-        print(
-            f"\nBackups existentes para edição {edition.capitalize() if edition else ''}:"
+        title = (
+            "\nBackups existentes para edição "
+            f"{edition.capitalize() if edition else ''}:"
         )
+        print(title)
         if backups:
             for j, b in enumerate(backups):
                 print(f"  {j + 1}. {b}")

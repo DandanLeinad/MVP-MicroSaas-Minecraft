@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 from backup import core, detect_bedrock, detect_java
 
@@ -35,7 +36,10 @@ def run_gui():
             lista_backups.insert(tk.END, "(nenhum backup encontrado)")
 
         label_status.config(
-            text=f"Listagem de mundos e backups para edição {edicao.capitalize()}"
+            text=(
+                "Listagem de mundos e backups para edição "
+                f"{edicao.capitalize()}"
+            )
         )
 
     def criar_backup():
@@ -52,10 +56,14 @@ def run_gui():
             else detect_bedrock.get_bedrock_worlds_path()
         )
 
-        core.make_backup(path, mundo, edicao)
-        label_status.config(
-            text=f"✅ Backup do mundo '{mundo}' criado com sucesso!"
-        )
+        sucesso = core.make_backup(path, mundo, edicao)
+        # Notificação via pop-up
+        if sucesso:
+            msg = f"Backup do mundo '{mundo}' criado com sucesso!"
+            messagebox.showinfo("Sucesso", msg)
+        else:
+            err_msg = f"Falha ao criar backup do mundo '{mundo}'."
+            messagebox.showerror("Erro", err_msg)
         # Atualiza lista de backups
         lista_backups.delete(0, tk.END)
         for b in core.list_backups(edicao):
@@ -73,10 +81,15 @@ def run_gui():
             if edicao == "java"
             else detect_bedrock.get_bedrock_worlds_path()
         )
-        core.restore_backup(path, backup_name, edicao)
-        label_status.config(
-            text=f"✅ Backup '{backup_name}' restaurado com sucesso!"
-        )
+        sucesso = core.restore_backup(path, backup_name, edicao)
+        # Notificação via pop-up
+        if sucesso:
+            msg = f"Backup '{backup_name}' restaurado com sucesso!"
+            messagebox.showinfo("Sucesso", msg)
+        else:
+            err_msg = f"Falha ao restaurar backup '{backup_name}'."
+            messagebox.showerror("Erro", err_msg)
+        label_status.config(text=f"Restaurar backup: {backup_name}")
 
     root = tk.Tk()
     root.title("Minecraft Backup GUI")
