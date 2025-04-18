@@ -1,4 +1,4 @@
-from src.backup import core, detect_bedrock, detect_java
+from backup import core, detect_bedrock, detect_java
 
 
 def main():

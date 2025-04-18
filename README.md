@@ -70,13 +70,19 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 
 ## Estrutura do Projeto
 
-- **src/main.py**: Arquivo principal que inicia a aplicação.
-- **src/backup/core.py**: Contém as funções principais para listar mundos, criar backups e gerenciar o menu.
-- **src/backup/detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
-- **src/backup/detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
+- **src/main.py**: Ponto de entrada principal do projeto.
+- **src/cli_main.py**: Contém a lógica para a interface de linha de comando (CLI).
+- **src/gui_main.py**: Contém a lógica para a interface gráfica (GUI).
+- **src/backup/**: Contém a lógica de negócio compartilhada.
+  - **core.py**: Funções principais para listar mundos, criar backups e gerenciar o menu.
+  - **detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
+  - **detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
+- **src/gui/**: Contém os componentes gráficos da interface GUI.
+  - **main_window.py**: Implementa a janela principal da interface gráfica.
+- **backups_worlds/**: Diretório onde os backups são salvos.
 - **Pipfile**: Gerencia as dependências do projeto.
 - **Pipfile.lock**: Contém informações detalhadas sobre as dependências do projeto.
-- **backups_worlds**: Diretório onde os backups são salvos.
+- **requirements.txt**: Lista as dependências do projeto para instalação com pip.
 
 ## Tratamento de Erros
 
