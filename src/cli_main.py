@@ -19,4 +19,4 @@ def run_cli():
         )
         return
 
-    core.menu(path)
+    core.menu(path, edition)

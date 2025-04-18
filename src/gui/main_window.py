@@ -48,7 +48,7 @@ def run_gui():
             else detect_bedrock.get_bedrock_worlds_path()
         )
 
-        core.make_backup(path, mundo)
+        core.make_backup(path, mundo, edicao)
         label_status.config(
             text=f"✅ Backup do mundo '{mundo}' criado com sucesso!"
         )
