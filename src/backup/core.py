@@ -32,6 +32,23 @@ def list_backups(edition=None):
         return []
 
 
+def restore_backup(worlds_path, backup_name, edition=None):
+    # Restaura o backup selecionado para o diretório de mundos
+    if edition == "java":
+        backup_dir = BACKUP_DIR_JAVA
+    elif edition == "bedrock":
+        backup_dir = BACKUP_DIR_BEDROCK
+    else:
+        backup_dir = BACKUP_DIR
+    src = os.path.join(backup_dir, backup_name)
+    try:
+        with zipfile.ZipFile(src, "r") as zipf:
+            zipf.extractall(worlds_path)
+        print(f"✅ Backup restaurado: {backup_name} em {worlds_path}")
+    except Exception as e:
+        print(f"❌ Falha ao restaurar backup: {e}")
+
+
 def make_backup(worlds_path, world_name, edition=None):
     # Seleciona o diretório de backup de acordo com a edição
     if edition == "java":
@@ -56,29 +73,52 @@ def make_backup(worlds_path, world_name, edition=None):
 
 
 def menu(worlds_path, edition=None):
-    # Lista mundos disponíveis
-    worlds = list_worlds(worlds_path)
-    if not worlds:
-        print("❌ Nenhum mundo encontrado.")
-        return
-    print("\nMundos disponíveis:")
-    for i, w in enumerate(worlds):
-        print(f"{i + 1}. {w}")
+    # Menu interativo para criar e restaurar backups
+    while True:
+        # Listagem de mundos
+        worlds = list_worlds(worlds_path)
+        print("\nMundos disponíveis:")
+        if worlds:
+            for i, w in enumerate(worlds):
+                print(f"  {i + 1}. {w}")
+        else:
+            print("  (nenhum mundo encontrado)")
 
-    # Lista backups existentes na edição
-    backups = list_backups(edition)
-    print(
-        f"\nBackups existentes para edição {edition.capitalize() if edition else ''}:"
-    )
-    if backups:
-        for j, b in enumerate(backups):
-            print(f"{j + 1}. {b}")
-    else:
-        print("(nenhum backup encontrado)")
+        # Listagem de backups
+        backups = list_backups(edition)
+        print(
+            f"\nBackups existentes para edição {edition.capitalize() if edition else ''}:"
+        )
+        if backups:
+            for j, b in enumerate(backups):
+                print(f"  {j + 1}. {b}")
+        else:
+            print("  (nenhum backup encontrado)")
 
-    idx = input("\nEscolha o número do mundo para backup: ")
-    try:
-        world_name = worlds[int(idx) - 1]
-        make_backup(worlds_path, world_name, edition)
-    except (IndexError, ValueError):
-        print("Entrada inválida.")
+        # Opções do usuário
+        print("\nOpções:")
+        print("  b - Criar backup de um mundo")
+        print("  r - Restaurar um backup")
+        print("  0 - Sair")
+        choice = input("Escolha uma opção: ").strip().lower()
+        if choice == "0":
+            break
+        elif choice == "b":
+            idx = input("Escolha o número do mundo para backup: ")
+            try:
+                world_name = worlds[int(idx) - 1]
+                make_backup(worlds_path, world_name, edition)
+            except Exception:
+                print("Entrada inválida.")
+        elif choice == "r":
+            if not backups:
+                print("Nenhum backup para restaurar.")
+                continue
+            idxb = input("Escolha o número do backup para restaurar: ")
+            try:
+                backup_name = backups[int(idxb) - 1]
+                restore_backup(worlds_path, backup_name, edition)
+            except Exception:
+                print("Entrada inválida.")
+        else:
+            print("Opção inválida.")
