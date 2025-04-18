@@ -1,26 +1,23 @@
-from backup import core, detect_bedrock, detect_java
+import argparse
 
 
 def main():
-    print("==== Minecraft Backup CLI ====")
-    edition = input("Qual edição você usa? (java/bedrock): ").strip().lower()
+    parser = argparse.ArgumentParser(
+        description="Minecraft Backup Tool (CLI/GUI)"
+    )
+    parser.add_argument(
+        "--gui", action="store_true", help="Executar interface gráfica"
+    )
+    args = parser.parse_args()
 
-    try:
-        if edition == "java":
-            worlds_path = detect_java.get_java_worlds_path()
-        elif edition == "bedrock":
-            worlds_path = detect_bedrock.get_bedrock_worlds_path()
-        else:
-            print("❌ Edição inválida. Digite 'java' ou 'bedrock'.")
-            return
-    except FileNotFoundError as e:
-        print(e)
-        return
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-        return
+    if args.gui:
+        from gui_main import run_gui
 
-    core.menu(worlds_path)
+        run_gui()
+    else:
+        from cli_main import run_cli
+
+        run_cli()
 
 
 if __name__ == "__main__":
