@@ -1,11 +1,5 @@
-from gui.main_window import MainWindow
+from gui.main_window import run_gui
 
 
-def main():
-    print("==== Minecraft Backup GUI ====")
-    app = MainWindow()
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
+def execute_gui():
+    run_gui()

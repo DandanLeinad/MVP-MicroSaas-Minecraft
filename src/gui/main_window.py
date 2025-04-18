@@ -1,12 +1,14 @@
 import tkinter as tk
 
 
-class MainWindow:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Minecraft Backup Tool")
+def run_gui():
+    root = tk.Tk()
+    root.title("Minecraft Backup GUI")
 
-    def run(self):
-        label = tk.Label(self.root, text="Bem-vindo ao Minecraft Backup Tool")
-        label.pack(pady=20)
-        self.root.mainloop()
+    label = tk.Label(root, text="Bem-vindo ao Backup de Mundos do Minecraft!")
+    label.pack(padx=20, pady=20)
+
+    btn = tk.Button(root, text="Fechar", command=root.destroy)
+    btn.pack(pady=10)
+
+    root.mainloop()
