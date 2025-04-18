@@ -27,7 +27,7 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 2.  Instale as dependências usando o Pipenv:
 
     ```bash
-    pipenv  install
+    pipenv  sync
     ```
 
 ## Uso
