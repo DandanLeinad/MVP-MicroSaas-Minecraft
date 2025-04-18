@@ -70,10 +70,10 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 
 ## Estrutura do Projeto
 
-- **main.py**: Arquivo principal que inicia a aplicação.
-- **backup/core.py**: Contém as funções principais para listar mundos, criar backups e gerenciar o menu.
-- **backup/detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
-- **backup/detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
+- **src/main.py**: Arquivo principal que inicia a aplicação.
+- **src/backup/core.py**: Contém as funções principais para listar mundos, criar backups e gerenciar o menu.
+- **src/backup/detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
+- **src/backup/detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
 - **Pipfile**: Gerencia as dependências do projeto.
 - **Pipfile.lock**: Contém informações detalhadas sobre as dependências do projeto.
 - **backups_worlds**: Diretório onde os backups são salvos.
