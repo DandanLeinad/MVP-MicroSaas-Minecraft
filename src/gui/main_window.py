@@ -16,16 +16,19 @@ def run_gui():
 
         if not path:
             label_status.config(
-                text="❌ Caminho não encontrado. O Minecraft pode não estar instalado."
+                text="❌ Caminho não encontrado. O Minecraft pode não estar instalado."  # NOQA
             )
+            lista_mundos.delete(0, tk.END)  # Limpa a lista de mundos
             return
 
         mundos = core.list_worlds(path)
+        lista_mundos.delete(
+            0, tk.END
+        )  # Limpa a lista de mundos antes de carregar novos
         if not mundos:
             label_status.config(text="❌ Nenhum mundo encontrado.")
             return
 
-        lista_mundos.delete(0, tk.END)
         for mundo in mundos:
             lista_mundos.insert(tk.END, mundo)
 
