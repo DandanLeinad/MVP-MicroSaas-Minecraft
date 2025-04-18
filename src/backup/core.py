@@ -18,6 +18,20 @@ def list_worlds(worlds_path):
         return []
 
 
+def list_backups(edition=None):
+    # Retorna arquivos .zip em diretório de backup da edição
+    if edition == "java":
+        dir_ = BACKUP_DIR_JAVA
+    elif edition == "bedrock":
+        dir_ = BACKUP_DIR_BEDROCK
+    else:
+        dir_ = BACKUP_DIR
+    try:
+        return [f for f in os.listdir(dir_) if f.lower().endswith(".zip")]
+    except FileNotFoundError:
+        return []
+
+
 def make_backup(worlds_path, world_name, edition=None):
     # Seleciona o diretório de backup de acordo com a edição
     if edition == "java":
@@ -42,6 +56,7 @@ def make_backup(worlds_path, world_name, edition=None):
 
 
 def menu(worlds_path, edition=None):
+    # Lista mundos disponíveis
     worlds = list_worlds(worlds_path)
     if not worlds:
         print("❌ Nenhum mundo encontrado.")
@@ -50,7 +65,18 @@ def menu(worlds_path, edition=None):
     for i, w in enumerate(worlds):
         print(f"{i + 1}. {w}")
 
-    idx = input("Escolha o número do mundo para backup: ")
+    # Lista backups existentes na edição
+    backups = list_backups(edition)
+    print(
+        f"\nBackups existentes para edição {edition.capitalize() if edition else ''}:"
+    )
+    if backups:
+        for j, b in enumerate(backups):
+            print(f"{j + 1}. {b}")
+    else:
+        print("(nenhum backup encontrado)")
+
+    idx = input("\nEscolha o número do mundo para backup: ")
     try:
         world_name = worlds[int(idx) - 1]
         make_backup(worlds_path, world_name, edition)
