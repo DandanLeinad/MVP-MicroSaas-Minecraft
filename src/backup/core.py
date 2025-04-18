@@ -55,7 +55,7 @@ def list_backups(edition=None):
 
 
 def restore_backup(worlds_path, backup_name, edition=None):
-    # Restaura o backup selecionado para o diretório de mundos
+    # Restaura o backup selecionado e salva metadata dentro da pasta do mundo
     if edition == "java":
         backup_dir = BACKUP_DIR_JAVA
     elif edition == "bedrock":
@@ -65,8 +65,22 @@ def restore_backup(worlds_path, backup_name, edition=None):
     src = os.path.join(backup_dir, backup_name)
     try:
         with zipfile.ZipFile(src, "r") as zipf:
-            zipf.extractall(worlds_path)
-        msg = f"✅ Backup restaurado: {backup_name} em {worlds_path}"
+            # lê metadata antes de extrair
+            metadata = {}
+            if "metadata.json" in zipf.namelist():
+                metadata = json.loads(zipf.read("metadata.json"))
+            # extrai todos os demais arquivos
+            for member in zipf.namelist():
+                if member == "metadata.json":
+                    continue
+                zipf.extract(member, worlds_path)
+            # salva metadata dentro da pasta do mundo como mvp2.json
+            world = metadata.get("world")
+            if world:
+                dest = os.path.join(worlds_path, world, "mvp2.json")
+                with open(dest, "w", encoding="utf-8") as mf:
+                    json.dump(metadata, mf, ensure_ascii=False, indent=2)
+        msg = f"✅ Backup restaurado: {backup_name}"
         print(Fore.GREEN + msg)
         return True
     except Exception as e:
