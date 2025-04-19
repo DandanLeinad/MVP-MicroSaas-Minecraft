@@ -10,14 +10,12 @@ Módulo de testes para gui.app:
 """
 
 import tkinter as tk
+from tkinter import messagebox
 
 import pytest
 
 from backup import core
 from gui.app import GuiApp
-
-tkmb = tk
-from tkinter import messagebox
 
 
 @pytest.fixture
