@@ -1,3 +1,12 @@
+"""
+Módulo de testes para backup.core:
+ - test_list_worlds: verifica listagem de mundos existentes (apenas diretórios).  # NOQA
+ - test_list_worlds_not_found: retorna lista vazia para caminho inexistente.
+ - test_list_backups_empty: sem arquivos de backup, retorna lista vazia.
+ - test_list_backups: zips com/s sem metadata retornam (nome, descrição).
+ - test_make_and_restore: cria backup e restaura mundo + mvp2.json.
+"""
+
 import json
 import zipfile
 
@@ -7,7 +16,7 @@ from backup.core import list_backups, list_worlds, make_backup, restore_backup
 
 
 def test_list_worlds(tmp_path):
-    # cria diretórios e arquivo solto
+    """Verifica que list_worlds retorna apenas os diretórios presentes."""
     (tmp_path / "world1").mkdir()
     (tmp_path / "world2").mkdir()
     (tmp_path / "note.txt").write_text("x")
@@ -16,12 +25,13 @@ def test_list_worlds(tmp_path):
 
 
 def test_list_worlds_not_found():
+    """Retorna [] quando o caminho não existe."""
     assert list_worlds("no_path") == []
 
 
 @pytest.fixture()
 def backup_dirs(tmp_path, monkeypatch):
-    # configura diretórios temporários para backups
+    """Prepara diretórios temporários e override das constantes de backup."""
     base = tmp_path / "backups"
     java = base / "java"
     bedrock = base / "bedrock"
@@ -44,13 +54,14 @@ def write_zip(path, name, include_meta=True, desc=None):
 
 
 def test_list_backups_empty(backup_dirs):
+    """Sem zips no diretório, list_backups retorna lista vazia."""
     assert list_backups() == []
     assert list_backups("java") == []
     assert list_backups("bedrock") == []
 
 
 def test_list_backups(backup_dirs):
-    # cria arquivos zip com e sem metadata
+    """Garante que zips com e sem metadata sejam listados corretamente."""
     base = backup_dirs / "backups"
     java = base / "java"
     bed = base / "bedrock"
@@ -64,7 +75,7 @@ def test_list_backups(backup_dirs):
 
 
 def test_make_and_restore(backup_dirs, monkeypatch, tmp_path):
-    # prepara mundo e backup
+    """Cria um backup de um mundo e restaura, validando arquivos e metadados."""
     worlds = tmp_path / "worlds"
     worlds.mkdir()
     w = worlds / "mundo"
