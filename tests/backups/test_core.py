@@ -75,7 +75,7 @@ def test_list_backups(backup_dirs):
 
 
 def test_make_and_restore(backup_dirs, monkeypatch, tmp_path):
-    """Cria um backup de um mundo e restaura, validando arquivos e metadados."""
+    """Cria um backup de um mundo e restaura, validando arquivos e metadados."""  # NOQA
     worlds = tmp_path / "worlds"
     worlds.mkdir()
     w = worlds / "mundo"
