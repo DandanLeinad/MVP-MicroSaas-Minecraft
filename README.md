@@ -4,12 +4,19 @@
 
 O **Minecraft Backup Tool** é uma ferramenta de linha de comando (CLI) desenvolvida em Python para criar backups dos mundos salvos do Minecraft. Ele suporta as edições **Java** e **Bedrock**, detectando automaticamente os diretórios de mundos salvos e permitindo ao usuário criar backups em formato `.zip`.
 
-## Funcionalidades - v0.1.0
+## Funcionalidades - v0.2.0
 
-- Detecta automaticamente os mundos salvos do Minecraft para as edições Java e Bedrock.
-- Lista os mundos disponíveis para backup.
-- Cria backups em formato `.zip` com um timestamp no nome do arquivo.
-- Salva os backups na pasta backups_worlds no diretório do projeto.
+- Suporte a descrições/tags de backup (opcional), armazenadas em `metadata.json` dentro do ZIP.
+- Listagem de backups existentes com suas descrições (CLI e GUI).
+- Restauração de backups: extrai arquivos do mundo e cria `mvp2.json` com metadados na pasta do mundo.
+- Interface gráfica (GUI):
+  - Campo de entrada para descrição/tag.  
+  - Listagem lado a lado de mundos e backups.  
+  - Botões para criar e restaurar backup.  
+  - Pop‑ups de notificação de sucesso/erro.
+- CLI interativa aprimorada:
+  - Prompt para adicionar descrição/tag no momento do backup.  
+  - Validação de caracteres inválidos na descrição.
 
 ## Requisitos
 
@@ -27,7 +34,7 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 2.  Instale as dependências usando o Pipenv:
 
     ```bash
-    pipenv  install
+    pipenv  sync
     ```
 
 ## Uso
@@ -48,7 +55,11 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
     - O programa listará os mundos disponíveis.
     - Escolha o número correspondente ao mundo desejado.
 
-4.  O backup será criado na pasta `backups_worlds`.
+4.  Adicione uma descrição/tag opcional para o backup.
+
+5.  O backup será criado na pasta `backups_worlds`.
+
+6.  Para restaurar um backup, selecione o arquivo desejado e o programa criará os arquivos do mundo e o `mvp2.json` com metadados.
 
 ### Exemplo de saída:
 
@@ -66,17 +77,25 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 
     Escolha o número do mundo para fazer backup: 1
 
+    Adicione uma descrição/tag para o backup (opcional): Backup inicial
+
     Backup criado: backups_worlds/MeuMundo_20250417-153000.zip
 
 ## Estrutura do Projeto
 
-- **main.py**: Arquivo principal que inicia a aplicação.
-- **backup/core.py**: Contém as funções principais para listar mundos, criar backups e gerenciar o menu.
-- **backup/detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
-- **backup/detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
+- **src/main.py**: Ponto de entrada principal do projeto.
+- **src/cli_main.py**: Contém a lógica para a interface de linha de comando (CLI).
+- **src/gui_main.py**: Contém a lógica para a interface gráfica (GUI).
+- **src/backup/**: Contém a lógica de negócio compartilhada.
+  - **core.py**: Funções principais para listar mundos, criar backups e gerenciar o menu.
+  - **detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
+  - **detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
+- **src/gui/**: Contém os componentes gráficos da interface GUI.
+  - **main_window.py**: Implementa a janela principal da interface gráfica.
+- **backups_worlds/**: Diretório onde os backups são salvos.
 - **Pipfile**: Gerencia as dependências do projeto.
 - **Pipfile.lock**: Contém informações detalhadas sobre as dependências do projeto.
-- **backups_worlds**: Diretório onde os backups são salvos.
+- **requirements.txt**: Lista as dependências do projeto para instalação com pip.
 
 ## Tratamento de Erros
 
