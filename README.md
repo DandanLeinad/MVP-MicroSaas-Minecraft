@@ -4,7 +4,7 @@
 
 O **Minecraft Backup Tool** é uma ferramenta de linha de comando (CLI) desenvolvida em Python para criar backups dos mundos salvos do Minecraft. Ele suporta as edições **Java** e **Bedrock**, detectando automaticamente os diretórios de mundos salvos e permitindo ao usuário criar backups em formato `.zip`.
 
-## Funcionalidades - v0.2.0
+## Funcionalidades - v0.2.1
 
 - Suporte a descrições/tags de backup (opcional), armazenadas em `metadata.json` dentro do ZIP.
 - Listagem de backups existentes com suas descrições (CLI e GUI).
@@ -39,10 +39,15 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 
 ## Uso
 
-1.  Execute o programa principal:
+1.  Execute o programa principal na interface de linha de comando (CLI):
 
     ```bash
-    python  main.py
+    python src/main_cli.py
+    ```
+   Ou para abrir a interface gráfica (GUI):
+
+    ```bash
+    python src/main_gui.py
     ```
 
 2.  Escolha a edição do Minecraft:
@@ -81,21 +86,34 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
 
     Backup criado: backups_worlds/MeuMundo_20250417-153000.zip
 
+## Testes
+
+Para validar o funcionamento e garantir que futuras alterações não quebrem funcionalidades, execute a suíte de testes com pytest:
+
+```bash
+# Instale o pytest se ainda não tiver:
+pip install --dev pytest
+
+# Execute todos os testes:
+pytest -q
+```
+
 ## Estrutura do Projeto
 
-- **src/main.py**: Ponto de entrada principal do projeto.
-- **src/cli_main.py**: Contém a lógica para a interface de linha de comando (CLI).
-- **src/gui_main.py**: Contém a lógica para a interface gráfica (GUI).
-- **src/backup/**: Contém a lógica de negócio compartilhada.
-  - **core.py**: Funções principais para listar mundos, criar backups e gerenciar o menu.
-  - **detect_java.py**: Detecta o caminho dos mundos salvos para a edição Java.
-  - **detect_bedrock.py**: Detecta o caminho dos mundos salvos para a edição Bedrock.
-- **src/gui/**: Contém os componentes gráficos da interface GUI.
-  - **main_window.py**: Implementa a janela principal da interface gráfica.
+- **src/main_cli.py**: Entry-point para a interface de linha de comando (CLI).
+- **src/main_gui.py**: Entry-point para a interface gráfica (GUI).
+- **src/cli/**: Lógica da CLI.
+  - **cli_main.py**: Função `run_cli()` que implementa o fluxo de backup pela linha de comando.
+- **src/gui/**: Componentes da GUI.
+  - **app.py**: Classe `GuiApp` com construção de widgets e callbacks.
+  - **main_window.py**: Stub que expõe `run_gui()`.
+- **src/backup/**: Lógica de negócio compartilhada.
+  - **core.py**: Funções para listar mundos, criar e restaurar backups.
+  - **detect_java.py**: Detecta o caminho dos mundos Java.
+  - **detect_bedrock.py**: Detecta o caminho dos mundos Bedrock.
+- **tests/**: Testes unitários e de integração usando pytest.
 - **backups_worlds/**: Diretório onde os backups são salvos.
-- **Pipfile**: Gerencia as dependências do projeto.
-- **Pipfile.lock**: Contém informações detalhadas sobre as dependências do projeto.
-- **requirements.txt**: Lista as dependências do projeto para instalação com pip.
+- **requirements.txt**, **Pipfile** e **Pipfile.lock**: Dependências do projeto.
 
 ## Tratamento de Erros
 
