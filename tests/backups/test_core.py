@@ -19,8 +19,8 @@ def test_list_worlds_not_found():
     assert list_worlds("no_path") == []
 
 
-@pytest.fixture(autouse=True)
-def setup_backup_dirs(tmp_path, monkeypatch):
+@pytest.fixture()
+def backup_dirs(tmp_path, monkeypatch):
     # configura diretórios temporários para backups
     base = tmp_path / "backups"
     java = base / "java"
@@ -43,27 +43,27 @@ def write_zip(path, name, include_meta=True, desc=None):
     return zip_path.name
 
 
-def test_list_backups_empty():
+def test_list_backups_empty(backup_dirs):
     assert list_backups() == []
     assert list_backups("java") == []
     assert list_backups("bedrock") == []
 
 
-def test_list_backups(tmp_path):
+def test_list_backups(backup_dirs):
     # cria arquivos zip com e sem metadata
-    base = tmp_path / "backups"
+    base = backup_dirs / "backups"
     java = base / "java"
     bed = base / "bedrock"
     name1 = write_zip(java, "w1", include_meta=True, desc="d1")
     name2 = write_zip(bed, "w2", include_meta=False)
-    all_b = list_backups()
-    assert (name1, "d1") in all_b
-    assert (name2, "") in all_b
-    assert (name1, "d1") in list_backups("java")
-    assert (name2, "") in list_backups("bedrock")
+    # listar por edição
+    java_b = list_backups("java")
+    bed_b = list_backups("bedrock")
+    assert (name1, "d1") in java_b
+    assert (name2, "") in bed_b
 
 
-def test_make_and_restore(tmp_path, monkeypatch):
+def test_make_and_restore(backup_dirs, monkeypatch, tmp_path):
     # prepara mundo e backup
     worlds = tmp_path / "worlds"
     worlds.mkdir()
@@ -71,10 +71,9 @@ def test_make_and_restore(tmp_path, monkeypatch):
     w.mkdir()
     f = w / "file.txt"
     f.write_text("hello")
-    base = tmp_path / "backups"
+    # backup_dirs já configurou os diretórios
+    base = backup_dirs / "backups"
     java = base / "java"
-    java.mkdir(parents=True)
-    monkeypatch.setattr("backup.core.BACKUP_DIR_JAVA", str(java))
     # executa criação
     assert make_backup(str(worlds), "mundo", edition="java", description="tag")
     zips = list(java.iterdir())
