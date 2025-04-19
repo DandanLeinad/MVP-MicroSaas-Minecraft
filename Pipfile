@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 typer = {extras = ["all"], version = "*"}
+colorama = "*"
 
 [dev-packages]
 pyinstaller = "*"
