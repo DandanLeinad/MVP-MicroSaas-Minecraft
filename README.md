@@ -4,12 +4,19 @@
 
 O **Minecraft Backup Tool** é uma ferramenta de linha de comando (CLI) desenvolvida em Python para criar backups dos mundos salvos do Minecraft. Ele suporta as edições **Java** e **Bedrock**, detectando automaticamente os diretórios de mundos salvos e permitindo ao usuário criar backups em formato `.zip`.
 
-## Funcionalidades - v0.1.0
+## Funcionalidades - v0.2.0
 
-- Detecta automaticamente os mundos salvos do Minecraft para as edições Java e Bedrock.
-- Lista os mundos disponíveis para backup.
-- Cria backups em formato `.zip` com um timestamp no nome do arquivo.
-- Salva os backups na pasta backups_worlds no diretório do projeto.
+- Suporte a descrições/tags de backup (opcional), armazenadas em `metadata.json` dentro do ZIP.
+- Listagem de backups existentes com suas descrições (CLI e GUI).
+- Restauração de backups: extrai arquivos do mundo e cria `mvp2.json` com metadados na pasta do mundo.
+- Interface gráfica (GUI):
+  - Campo de entrada para descrição/tag.  
+  - Listagem lado a lado de mundos e backups.  
+  - Botões para criar e restaurar backup.  
+  - Pop‑ups de notificação de sucesso/erro.
+- CLI interativa aprimorada:
+  - Prompt para adicionar descrição/tag no momento do backup.  
+  - Validação de caracteres inválidos na descrição.
 
 ## Requisitos
 
@@ -48,7 +55,11 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
     - O programa listará os mundos disponíveis.
     - Escolha o número correspondente ao mundo desejado.
 
-4.  O backup será criado na pasta `backups_worlds`.
+4.  Adicione uma descrição/tag opcional para o backup.
+
+5.  O backup será criado na pasta `backups_worlds`.
+
+6.  Para restaurar um backup, selecione o arquivo desejado e o programa criará os arquivos do mundo e o `mvp2.json` com metadados.
 
 ### Exemplo de saída:
 
@@ -65,6 +76,8 @@ Para garantir que o projeto funcione com os pacotes corretos e evitar conflitos 
     0. Sair
 
     Escolha o número do mundo para fazer backup: 1
+
+    Adicione uma descrição/tag para o backup (opcional): Backup inicial
 
     Backup criado: backups_worlds/MeuMundo_20250417-153000.zip
 
