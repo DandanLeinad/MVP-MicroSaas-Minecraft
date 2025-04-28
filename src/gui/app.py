@@ -83,10 +83,10 @@ class GuiApp:
         self.list_backups.delete(0, tk.END)
         self.desc_entry.delete(0, tk.END)
         # Lista mundos
-        worlds = core.list_worlds(path) if path else []
-        if worlds:
-            for m in worlds:
-                self.list_mundos.insert(tk.END, m)
+        self.worlds_list = core.list_worlds(path) if path else []
+        if self.worlds_list:
+            for folder, display in self.worlds_list:
+                self.list_mundos.insert(tk.END, display)
         else:
             self.list_mundos.insert(tk.END, "(nenhum mundo encontrado)")
         # Lista backups
@@ -107,7 +107,16 @@ class GuiApp:
         if not sel:
             self.label_status.config(text="❌ Nenhum mundo selecionado.")
             return
-        world = self.list_mundos.get(sel)
+        # mapeia display selecionado para folder_name
+        display = self.list_mundos.get(sel)
+        world = None
+        for folder, disp in getattr(self, "worlds_list", []):
+            if disp == display:
+                world = folder
+                break
+        if not world:
+            self.label_status.config(text="❌ Mundo inválido selecionado.")
+            return
         ed = self.edicao_var.get()
         path = (
             detect_java.get_java_worlds_path()
