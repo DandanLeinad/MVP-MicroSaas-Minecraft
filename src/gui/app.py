@@ -19,6 +19,10 @@ class GuiApp:
         self.edicao_var = tk.StringVar(value="java")
         # Construção dos elementos da interface
         self._build_widgets()
+        # Atualiza backups ao selecionar um mundo
+        self.list_mundos.bind(
+            "<<ListboxSelect>>", lambda e: self._on_world_select()
+        )
 
     def _build_widgets(self):
         # Widgets de seleção de edição
@@ -89,17 +93,35 @@ class GuiApp:
                 self.list_mundos.insert(tk.END, display)
         else:
             self.list_mundos.insert(tk.END, "(nenhum mundo encontrado)")
-        # Lista backups
-        backups = core.list_backups(ed)
-        if backups:
-            for fname, desc in backups:
+        # Limpa lista de backups até seleção de mundo
+        self.list_backups.delete(0, tk.END)
+        self.list_backups.insert(tk.END, "(selecione um mundo)")
+        self.label_status.config(
+            text=f"Listagem para edição {ed.capitalize()}"
+        )
+
+    def _on_world_select(self):
+        """Atualiza lista de backups conforme o mundo selecionado."""
+        sel = self.list_mundos.curselection()
+        self.list_backups.delete(0, tk.END)
+        if not sel or not hasattr(self, "worlds_list"):
+            self.list_backups.insert(tk.END, "(nenhum backup)")
+            return
+        display = self.list_mundos.get(sel)
+        # identifica folder pelo display
+        folder = next((f for f, d in self.worlds_list if d == display), None)
+        if not folder:
+            self.list_backups.insert(tk.END, "(nenhum backup)")
+            return
+        ed = self.edicao_var.get()
+        all_backs = core.list_backups(ed)
+        backs = [(b, d) for b, d in all_backs if b.startswith(folder + "_")]
+        if backs:
+            for fname, desc in backs:
                 label = f"{fname} - {desc}" if desc else fname
                 self.list_backups.insert(tk.END, label)
         else:
             self.list_backups.insert(tk.END, "(nenhum backup encontrado)")
-        self.label_status.config(
-            text=f"Listagem para edição {ed.capitalize()}"
-        )
 
     def _create_backup(self):
         """Cria backup do mundo selecionado."""
@@ -138,11 +160,8 @@ class GuiApp:
             messagebox.showerror(
                 "Erro", f"Falha ao criar backup do mundo '{world}'."
             )
-        # Atualiza lista de backups
-        self.list_backups.delete(0, tk.END)
-        for fname, d in core.list_backups(ed):
-            label = f"{fname} - {d}" if d else fname
-            self.list_backups.insert(tk.END, label)
+        # Atualiza backups filtrando pelo mundo atual
+        self._on_world_select()
 
     def _restore_backup(self):
         """Restaura backup selecionado."""

@@ -161,23 +161,10 @@ class BackupManager:
             else:
                 print("  (nenhum mundo encontrado)")
 
-            # Listagem de backups
-            backups = self.list_backups(edition)
-            title = (
-                "\nBackups existentes para edição "
-                f"{edition.capitalize() if edition else ''}:"
-            )
-            print(title)
-            if backups:
-                for j, (b, desc) in enumerate(backups):
-                    print(f"  {j + 1}. {b} - {desc}")
-            else:
-                print("  (nenhum backup encontrado)")
-
             # Opções do usuário
             print("\nOpções:")
             print("  b - Criar backup de um mundo")
-            print("  r - Restaurar um backup")
+            print("  r - Restaurar um backup de um mundo")
             print("  0 - Sair")
             choice = input("Escolha uma opção: ").strip().lower()
             if choice == "0":
@@ -190,7 +177,7 @@ class BackupManager:
                     # descrição opcional
                     desc = input("Descrição/tag (opcional): ").strip()
                     # valida caracteres inválidos
-                    if any(c in desc for c in r"\/:*?\"<>|"):
+                    if any(c in desc for c in r"\\/:*?\"<>|"):
                         print("❌ Descrição contém caracteres inválidos.")
                     else:
                         self.make_backup(
@@ -199,12 +186,29 @@ class BackupManager:
                 except Exception:
                     print("Entrada inválida.")
             elif choice == "r":
-                if not backups:
-                    print("Nenhum backup para restaurar.")
+                # Seleciona o mundo para restaurar
+                idxw = input(
+                    "Escolha o número do mundo para restaurar backup: "
+                )
+                try:
+                    folder, _ = worlds[int(idxw) - 1]
+                except Exception:
+                    print("Entrada inválida.")
                     continue
+                # filtra backups do mundo
+                all_backs = self.list_backups(edition)
+                backs = [
+                    (b, d) for b, d in all_backs if b.startswith(folder + "_")
+                ]
+                if not backs:
+                    print(f"  (nenhum backup encontrado para {folder})")
+                    continue
+                print("\nBackups disponíveis para o mundo:")
+                for j, (b, d) in enumerate(backs):
+                    print(f"  {j + 1}. {b} - {d}")
                 idxb = input("Escolha o número do backup para restaurar: ")
                 try:
-                    backup_name = backups[int(idxb) - 1][0]
+                    backup_name = backs[int(idxb) - 1][0]
                     self.restore_backup(worlds_path, backup_name, edition)
                 except Exception:
                     print("Entrada inválida.")
