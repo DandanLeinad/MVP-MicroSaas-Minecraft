@@ -17,12 +17,26 @@ BACKUP_DIR_JAVA = "backups_worlds/java"
 
 
 def list_worlds(worlds_path):
+    """Retorna lista de tuplas (folder_name, display_name) lendo levelname.txt."""
     try:
-        return [
-            d
-            for d in os.listdir(worlds_path)
-            if os.path.isdir(os.path.join(worlds_path, d))
-        ]
+        result = []
+        for d in os.listdir(worlds_path):
+            full = os.path.join(worlds_path, d)
+            if not os.path.isdir(full):
+                continue
+            name = d
+            display = d
+            # tenta ler display name em levelname.txt
+            level_file = os.path.join(full, "levelname.txt")
+            try:
+                with open(level_file, "r", encoding="utf-8") as f:
+                    text = f.read().strip()
+                    if text:
+                        display = text
+            except Exception:
+                pass
+            result.append((name, display))
+        return result
     except FileNotFoundError:
         return []
 
@@ -134,8 +148,8 @@ def menu(worlds_path, edition=None):
         worlds = list_worlds(worlds_path)
         print("\nMundos disponíveis:")
         if worlds:
-            for i, w in enumerate(worlds):
-                print(f"  {i + 1}. {w}")
+            for i, (folder, display) in enumerate(worlds):
+                print(f"  {i + 1}. {display}")
         else:
             print("  (nenhum mundo encontrado)")
 
@@ -163,7 +177,8 @@ def menu(worlds_path, edition=None):
         elif choice == "b":
             idx = input("Escolha o número do mundo para backup: ")
             try:
-                world_name = worlds[int(idx) - 1]
+                folder, _ = worlds[int(idx) - 1]
+                world_name = folder
                 # descrição opcional
                 desc = input("Descrição/tag (opcional): ").strip()
                 # valida caracteres inválidos
