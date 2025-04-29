@@ -47,7 +47,9 @@ class GuiApp:
         # Lista de mundos e campo de descrição
         frame_mundos = tk.LabelFrame(frame, text="Mundos", padx=5, pady=5)
         frame_mundos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
-        self.list_mundos = tk.Listbox(frame_mundos, width=30, height=15)
+        self.list_mundos = tk.Listbox(
+            frame_mundos, width=30, height=15, exportselection=False
+        )
         self.list_mundos.pack(fill=tk.BOTH, expand=True)
         tk.Label(frame_mundos, text="Descrição (opcional):").pack(pady=(5, 0))
         self.desc_entry = tk.Entry(frame_mundos)
@@ -60,7 +62,9 @@ class GuiApp:
         frame_backups.pack(
             side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(5, 0)
         )
-        self.list_backups = tk.Listbox(frame_backups, width=30, height=15)
+        self.list_backups = tk.Listbox(
+            frame_backups, width=30, height=15, exportselection=False
+        )
         self.list_backups.pack(fill=tk.BOTH, expand=True)
         tk.Button(
             frame_backups,
