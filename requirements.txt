@@ -13,7 +13,7 @@ pyinstaller-hooks-contrib==2025.3
 pytest==8.3.5
 pywin32-ctypes==0.2.3
 rich==14.0.0
-setuptools==78.1.0
+setuptools==78.1.1
 shellingham==1.5.4
 typer==0.15.2
 typing_extensions==4.13.2
